@@ -71,7 +71,7 @@ var deliveries = [{
 //list of actors for payment
 //useful from exercise 5
 const actors = [{
-  'deliveryId': 'bba9500c-fd9e-453f-abf1-4cd8f52af377',
+  'rentalId': 'bba9500c-fd9e-453f-abf1-4cd8f52af377',
   'payment': [{
     'who': 'shipper',
     'type': 'debit',
@@ -154,6 +154,17 @@ function get_trucker(idDelivery)
   }
 }
 
+function get_actors(idDelivery)
+{
+  for (var i=0; i< actors.length; i++)
+  {
+    if (actors[i].rentalId == idDelivery)
+    {
+      return actors[i];
+    }
+  }
+}
+
 function final_function()
 {
   for (var i=0; i<deliveries.length; i++)
@@ -183,7 +194,7 @@ function final_function()
     var shippingPriceReduction = deliveries[i].distance* currentTrucker.pricePerKm + deliveries[i].volume*newPricePerVolume;
     deliveries[i].price = shippingPriceReduction;
 
-    //Exercise 3 - give me all your money
+    //Exercise 3 - Give me all your money
     var currentPrice = deliveries[i].price ;
     var commission = currentPrice * 0.3;
     var insurance = commission/2;
@@ -200,57 +211,39 @@ function final_function()
     {
       deductibleOption = deliveries[i].volume // * 1 euro
     }
-    var shippingPriceDeductibleOption = currentPrice + deductibleOption;
-    deliveries[i].price = shippingPriceDeductibleOption;
+    var shippingPriceWithDeductibleOption = currentPrice + deductibleOption;
+    deliveries[i].price = shippingPriceWithDeductibleOption;
+
+    //Exercise 5 - Pay the actors
+    var currentActor = get_actors(deliveries[i].id);
+
+    for (var j=0; j<currentActor.payment.length; j++)
+    {
+      if (currentActor.payment[j].who == "shipper")
+      {
+        currentActor.payment[j].amount = shippingPriceWithDeductibleOption;
+      }
+      if (currentActor.payment[j].who == "owner")
+      {
+        currentActor.payment[j].amount = shippingPriceReduction - commission;
+      }
+      if (currentActor.payment[j].who == "insurance")
+      {
+        currentActor.payment[j].amount = insurance;
+      }
+      if (currentActor.payment[j].who == "treasury")
+      {
+        currentActor.payment[j].amount = treasury;
+      }
+      if (currentActor.payment[j].who == "convargo")
+      {
+        currentActor.payment[j].amount = convargo + deductibleOption;
+      }
+    }
   }
 }
 
-//mes fonctions tests avant de les ajouter dans ma fonction finale
-function pay_less()
-{
-  for (var i=0; i<deliveries.length; i++)
-  {
-    var trucker = get_trucker(deliveries[i].truckerId);
-    var newPricePerVolume = trucker.pricePerVolume;
 
-    if (deliveries[i].volume >=5 && deliveries[i].volume<10)
-    {
-      newPricePerVolume = trucker.pricePerVolume - trucker.pricePerVolume*0.1;
-    }
-
-    if (deliveries[i].volume >=10 && deliveries[i].volume<30)
-    {
-      newPricePerVolume = trucker.pricePerVolume - trucker.pricePerVolume*0.3;
-    }
-
-    if (deliveries[i].volume >=30)
-    {
-      newPricePerVolume = trucker.pricePerVolume - trucker.pricePerVolume*0.5;
-    }
-
-    deliveries[i].price = deliveries[i].distance* trucker.pricePerKm + deliveries[i].volume*newPricePerVolume;
-
-  }
-}
-
-function give_me_money()
-{
-  for (var i=0;i<deliveries.length; i++)
-  {
-    var price = deliveries[i].price ;
-    var commission = price * 0.3;
-    var insurance = commission/2;
-    var treasury = parseInt(deliveries[i].distance / 500 )+1;
-    var convargo =  commission - treasury - insurance;
-
-    deliveries[i].commission.insurance = insurance;
-    deliveries[i].commission.treasury = treasury;
-    deliveries[i].commission.convargo = convargo;
-  }
-}
-
-//pay_less();
-//give_me_money();
 final_function();
 console.log(truckers);
 console.log(deliveries);
