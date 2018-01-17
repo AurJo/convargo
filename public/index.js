@@ -156,7 +156,30 @@ function shipping_price(){
   }
 };
 
+//Exercise 2 - Send more pay less
+function pay_less(){
+  for (var i=0; i<deliveries.length; i++)
+  {
+    var reduction = 0;
+    if (deliveries[i].volume > 25)
+    {
+      reduction = deliveries[i].price * 0.5;
+    }
+    if (deliveries[i].volume > 10 && deliveries[i].volume <25)
+    {
+      reduction = deliveries[i].price * 0.3;
+    }
+    if (deliveries[i].volume > 5 && deliveries[i].volume <10)
+    {
+      reduction = deliveries[i].price * 0.1;
+    }
+    deliveries[i].price = deliveries[i].price - reduction;
+  }
+}
+//116.9
+//297.5
 shipping_price();
+pay_less();
 console.log(truckers);
 console.log(deliveries);
 console.log(actors);
