@@ -141,45 +141,110 @@ const actors = [{
   }]
 }];
 
-//Exercise 1 - Euro-Volume
-function shipping_price(){
-  for(var i=0; i< truckers.length; i++)
-  {
-    for (var j=0; j<deliveries.length; j++)
-    {
-      if(truckers[i].id == deliveries[j].truckerId)
-      {
-        var shippingprice = truckers[i].pricePerKm * deliveries[j].distance + truckers[i].pricePerVolume*deliveries[j].volume;
-        deliveries[j].price = shippingprice;
-      }
-    }
-  }
-};
 
-//Exercise 2 - Send more pay less
-function pay_less(){
-  for (var i=0; i<deliveries.length; i++)
+
+function get_trucker(idDelivery)
+{
+  for (var i=0; i< truckers.length; i++)
   {
-    var reduction = 0;
-    if (deliveries[i].volume > 25)
+    if (truckers[i].id == idDelivery)
     {
-      reduction = deliveries[i].price * 0.5;
+      return truckers[i];
     }
-    if (deliveries[i].volume > 10 && deliveries[i].volume <25)
-    {
-      reduction = deliveries[i].price * 0.3;
-    }
-    if (deliveries[i].volume > 5 && deliveries[i].volume <10)
-    {
-      reduction = deliveries[i].price * 0.1;
-    }
-    deliveries[i].price = deliveries[i].price - reduction;
   }
 }
-//116.9
-//297.5
-shipping_price();
-pay_less();
+
+function final_function()
+{
+  for (var i=0; i<deliveries.length; i++)
+  {
+    var currentTrucker = get_trucker(deliveries[i].truckerId);
+    var shippingPrice = currentTrucker.pricePerKm* deliveries[i].distance + currentTrucker.pricePerVolume*deliveries[i].volume;
+    deliveries[i].price = shippingPrice;
+
+    //Exercise 2 - Send more pay less
+    var newPricePerVolume = currentTrucker.pricePerVolume;
+
+    if (deliveries[i].volume >=5 && deliveries[i].volume<10)
+    {
+      newPricePerVolume = currentTrucker.pricePerVolume - currentTrucker.pricePerVolume*0.1;
+    }
+
+    if (deliveries[i].volume >=10 && deliveries[i].volume<25)
+    {
+      newPricePerVolume = currentTrucker.pricePerVolume - currentTrucker.pricePerVolume*0.3;
+    }
+
+    if (deliveries[i].volume >=25)
+    {
+      newPricePerVolume = currentTrucker.pricePerVolume - currentTrucker.pricePerVolume*0.5;
+    }
+
+    var shippingPriceReduction = deliveries[i].distance* currentTrucker.pricePerKm + deliveries[i].volume*newPricePerVolume;
+    deliveries[i].price = shippingPriceReduction;
+
+    //Exercise 3 - give me all your money
+    var currentPrice = deliveries[i].price ;
+    var commission = currentPrice * 0.3;
+    var insurance = commission/2;
+    var treasury = parseInt(deliveries[i].distance / 500 )+1;
+    var convargo = commission - insurance- treasury;
+
+    deliveries[i].commission.insurance = insurance;
+    deliveries[i].commission.treasury = treasury;
+    deliveries[i].commission.convargo = convargo;
+
+  }
+}
+
+//mes fonctions tests avant de les ajouter dans ma fonction finale
+function pay_less()
+{
+  for (var i=0; i<deliveries.length; i++)
+  {
+    var trucker = get_trucker(deliveries[i].truckerId);
+    var newPricePerVolume = trucker.pricePerVolume;
+
+    if (deliveries[i].volume >=5 && deliveries[i].volume<10)
+    {
+      newPricePerVolume = trucker.pricePerVolume - trucker.pricePerVolume*0.1;
+    }
+
+    if (deliveries[i].volume >=10 && deliveries[i].volume<30)
+    {
+      newPricePerVolume = trucker.pricePerVolume - trucker.pricePerVolume*0.3;
+    }
+
+    if (deliveries[i].volume >=30)
+    {
+      newPricePerVolume = trucker.pricePerVolume - trucker.pricePerVolume*0.5;
+    }
+
+    deliveries[i].price = deliveries[i].distance* trucker.pricePerKm + deliveries[i].volume*newPricePerVolume;
+
+  }
+}
+
+function give_me_money()
+{
+  for (var i=0;i<deliveries.length; i++)
+  {
+    var price = deliveries[i].price ;
+    var commission = price * 0.3;
+    var insurance = commission/2;
+    var treasury = parseInt(deliveries[i].distance / 500 )+1;
+    var convargo =  commission - treasury - insurance;
+
+    deliveries[i].commission.insurance = insurance;
+    deliveries[i].commission.treasury = treasury;
+    deliveries[i].commission.convargo = convargo;
+  }
+}
+
+
+//pay_less();
+//give_me_money();
+final_function();
 console.log(truckers);
 console.log(deliveries);
 console.log(actors);
