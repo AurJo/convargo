@@ -194,6 +194,14 @@ function final_function()
     deliveries[i].commission.treasury = treasury;
     deliveries[i].commission.convargo = convargo;
 
+    //Exercise 4 - The famous deductible
+    var deductibleOption=0;
+    if (deliveries[i].options.deductibleReduction == true)
+    {
+      deductibleOption = deliveries[i].volume // * 1 euro
+    }
+    var shippingPriceDeductibleOption = currentPrice + deductibleOption;
+    deliveries[i].price = shippingPriceDeductibleOption;
   }
 }
 
@@ -240,7 +248,6 @@ function give_me_money()
     deliveries[i].commission.convargo = convargo;
   }
 }
-
 
 //pay_less();
 //give_me_money();
